@@ -84,7 +84,7 @@ public class TestAction implements Callable<String> {
     private final String arg;
     private String prop;
 
-    public TestAction(String arg) { this.arg = "Hello World!"; }
+    public TestAction(String arg) { this.arg = arg; }
 
     public void setProp(String prop) { this.prop = prop; }
 
