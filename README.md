@@ -1,9 +1,9 @@
 # jesque-cli
-A command-line interface for [Jesque](https://github.com/pierredavidbelanger/jesque), an implementation of [Resque](https://github.com/resque/resque) in [Java](https://www.java.com).
+A command-line interface for [Jesque](https://github.com/gresrun/jesque), an implementation of [Resque](https://github.com/resque/resque) in [Java](https://www.java.com).
 
-## --help
+## Usage
 
-With [jesque-cli-with-dependencies.jar](https://oss.sonatype.org/content/repositories/snapshots/ca/pjer/jesque-cli/0.1.0-SNAPSHOT/jesque-cli-0.1.0-20151005.022659-1-jar-with-dependencies.jar):
+With the latest [jesque-cli-with-dependencies.jar](https://oss.sonatype.org/content/repositories/snapshots/ca/pjer/jesque-cli/0.1.0-SNAPSHOT/jesque-cli-0.1.0-20151005.022659-1-jar-with-dependencies.jar) snapshot:
 
 ```bash
 $ java -jar jesque-cli-with-dependencies.jar --help
@@ -51,7 +51,7 @@ Usage: <main class> [options] [command] [command options]
              Default: redis://localhost:6379
 ```
 
-## enqueue
+### enqueue
 
 To enqueue `{"class":"TestAction","args":["a ctor arg"],"vars":{"prop":"a java bean property"}}` into `myqueue` (with a running Redis at `localhost:6379`):
 
@@ -62,7 +62,7 @@ $ java -jar jesque-cli-with-dependencies.jar enqueue \
     -v prop='a java bean property'
 ```
 
-## work
+### work
 
 To run a worker that will run the above job from `myqueue` (with a running Redis at `localhost:6379`):
 
@@ -93,4 +93,41 @@ public class TestAction implements Callable<String> {
         return arg;
     }
 }
+```
+
+## Integration with Maven
+
+Adding this plugin into the `<project> <build> <plugins>` element of a `pom.xml` will fetch the latest latest [jesque-cli-with-dependencies.jar](https://oss.sonatype.org/content/repositories/snapshots/ca/pjer/jesque-cli/0.1.0-SNAPSHOT/jesque-cli-0.1.0-20151005.022659-1-jar-with-dependencies.jar) snapshot and copy it to `target/dependency/jesque-cli.jar`.
+
+```xml
+<plugin>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>copy-dependency</id>
+            <phase>package</phase>
+            <goals>
+                <goal>copy</goal>
+            </goals>
+            <configuration>
+                <artifactItems>
+                    <artifactItem>
+                        <groupId>ca.pjer</groupId>
+                        <artifactId>jesque-cli</artifactId>
+                        <version>0.1.0-SNAPSHOT</version>
+                        <classifier>jar-with-dependencies</classifier>
+                        <destFileName>jesque-cli.jar</destFileName>
+                    </artifactItem>
+                </artifactItems>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+```
+
+It will now be in a suitable place to be run with (for example) a `Procfile`:
+
+```Procfile
+web: java -jar target/my-app.jar
+worker: java -jar target/dependency/jesque-cli.jar work myqueue -r $REDIS_URL -cp target/my-app.jar -p com.acme.job -n 2
 ```
