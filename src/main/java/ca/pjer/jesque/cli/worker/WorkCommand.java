@@ -21,7 +21,7 @@ public class WorkCommand extends Command {
     private List<String> sources = new ArrayList<String>();
 
     @Parameter(names = {"-cp", "--classpath", "--class-paths"}, description = "The class paths to load job classes from", variableArity = true)
-    private List<String> classpaths = new ArrayList<String>(Collections.singletonList(""));
+    private List<String> classpaths = new ArrayList<String>();
 
     @Parameter(names = {"-p", "--packages"}, description = "The packages to look into for job classes", variableArity = true)
     private List<String> packages = new ArrayList<String>(Collections.singletonList(""));
